@@ -1,12 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 SET(CMAKE_SYSTEM_NAME Generic)
 #============================================================================================
-PROJECT(avr)                    # <-- ProjectName
+PROJECT(AVR)                    # <-- ProjectName
 
 SET(FILES main.c)		  	    # <-- Project Files
 
-SET(DEVICE atmega16)			# <-- MCU
+SET(DEVICE ATmega16)			# <-- MCU
 SET(FREQ 8000000)			    # <-- MCU-Frequenz
+set(FUSE 0x04)                  # <-- fuse bits
 
 SET(AVRBIN
         /usr/local/Cellar/avr-gcc@9/9.3.0_3/bin)    # <-- Toolchain
@@ -16,14 +17,14 @@ SET(AVROBJCOPY avr-objcopy)		# <--     ""
 SET(AVRSIZE avr-size)			# <--     ""
 SET(AVRDUDE avrdude)			# <--     ""
 
-SET(PROGRAMMER avrispmkii)		# <-- Programmer Type
+SET(PROGRAMMER usbasp)		    # <-- Programmer Type
 SET(PORT usb)		         	# <-- Port Type/name   ex: /dev/cu.00000000
 SET(BAUD 57600)	        	    # <-- Baudrate
 
 SET(COMPILE_FLAGS -Wall -Os -mmcu=${DEVICE} -DF_CPU=${FREQ}UL)   # <--    "c flags"
 
 
-SET(EEPROM no)	     	        # <-- set yes if you want .eep file !
+SET(EEPROM yes)	     	        # <-- set yes if you want .eep file !
 SET(FLASH no)		        	# <-- this command is for program hardware !!! set it no if you dont wanna program dvice !
 
 #============================================================================================
@@ -65,7 +66,7 @@ if(EEPROM)
 endif(EEPROM)
 ADD_CUSTOM_COMMAND(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${AVRSIZE} ARGS --target=ihex ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex)
 if(FLASH)
-    ADD_CUSTOM_COMMAND(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${AVRDUDE} ARGS -p ${DEVICE} -c ${PROGRAMMER} -P ${PORT} -b ${BAUD} -U flash:w:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex)
+    ADD_CUSTOM_COMMAND(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD COMMAND ${AVRDUDE} ARGS -p ${DEVICE} -c ${PROGRAMMER} -P ${PORT} -b ${BAUD} -U lfuse:w:${FUSE}:m -U flash:w:${OUTP}/${CMAKE_PROJECT_NAME}.hex)
 endif(FLASH)
 
 
