@@ -1,25 +1,15 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
-#============================================================================================
-PROJECT(KeyPad C CXX)                    # <-- ProjectName
-
-SET(CMAKE_TOOLCHAIN_FILE AVRBIN)
-
-
-
-SET(FILES main.c)		  	    # <-- Project Files
-
-SET(DEVICE ATmega16)			# <-- MCU
-SET(FREQ 8000000)			    # <-- MCU-Frequenz
-set(FUSE 0x04)                  # <-- fuse bits
 
 
 
 SET(AVRBIN
-        "/usr/local/Cellar/avr-gcc@9/9.3.0_3/bin/")    # <-- Toolchain
+        "/usr/local/Cellar/avr-gcc@9/9.3.0_3/bin")    # <-- Toolchain
 
 
-SET(AVRCPP ${AVRBIN}avr-g++)             # <--     ""
-SET(AVRGCC ${AVRBIN}avr-gcc)             # <--     ""
+
+
+SET(AVRCPP avr-g++)             # <--     ""
+SET(AVRGCC avr-gcc)             # <--     ""
 SET(AVROBJCOPY avr-objcopy)		# <--     ""
 SET(AVRSIZE avr-size)			# <--     ""
 SET(AVRDUDE avrdude)            # <--     ""
@@ -29,24 +19,27 @@ SET(PORT usb)		         	# <-- Port Type/name   ex: /dev/cu.00000000
 SET(BAUD 57600)	        	    # <-- Baudrate
 
 
+SET(CMAKE_C_COMPILER ${AVRBIN}/${AVRGCC})
+SET(CMAKE_ASM_COMPILER ${AVRBIN}/${AVRGCC})
+SET(CMAKE_CXX_COMPILER ${AVRBIN}/${AVRCPP})
 
-enable_language(CXX)
-enable_language(C)
 
 
+#============================================================================================
+PROJECT(untiteld10 C CXX ASM)                    # <-- ProjectName
+
+
+SET(FILES main.c)		  	    # <-- Project Files
+
+SET(DEVICE ATmega16)			# <-- MCU
+SET(FREQ 8000000)			    # <-- MCU-Frequenz
+set(FUSE 0x04)                  # <-- fuse bits
 
 
 SET(COMPILE_FLAGS -Wall -Os -mmcu=${DEVICE} -DF_CPU=${FREQ}UL)   # <--    "c flags"
 
-
-SET(EEPROM yes)	     	        # <-- set yes if you want .eep file !
-SET(FLASH no)		        	# <-- this command is for program hardware !!! set it no if you dont wanna program dvice !
-
 #============================================================================================
 
-SET(CMAKE_C_COMPILER ${AVRGCC})
-SET(CMAKE_ASM_COMPILER ${AVRGCC})
-SET(CMAKE_CXX_COMPILER ${AVRCPP})
 
 SET(CMAKE_C_FLAGS  "-Os -mmcu=${DEVICE} -DF_CPU=${FREQ}UL -std=gnu99 -Wl,--gc-sections")
 SET(CMAKE_CXX_FLAGS "-Os -mmcu=${DEVICE} -DF_CPU=${FREQ}UL -Wl,--gc-sections")
@@ -56,21 +49,22 @@ SET(CMAKE_BUILD_ "${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 SET(OUTP ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-set(CMAKE_CONFIGURATION_TYPES "AVR;Flash" CACHE STRING "" FORCE )
 
 set(CMAKE_PREFIX_PATH /opt/local/avr)
+
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
-
-
-include_directories( /opt/local/avr/include)
+include_directories(/opt/local/avr/include)
 
 SET(SOURCE_FILES ${FILES})
 #============================================================================================
 FILE(MAKE_DIRECTORY ${OUTP})
 
 
-ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${FILES} )
+set(CMAKE_CONFIGURATION_TYPES "AVR;Flash" CACHE STRING "" FORCE )
+
+
+ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCE_FILES} )
 
 #
 add_custom_target(strip ALL     ${AVRSTRIP} "${OUTP}/${CMAKE_PROJECT_NAME}.elf" DEPENDS ${CMAKE_PROJECT_NAME})
